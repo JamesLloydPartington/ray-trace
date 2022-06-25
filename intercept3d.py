@@ -1,5 +1,5 @@
 import numpy as np
-from grad import dydx_x
+from grad import dfdx_xy, dfdy_xy
 
 # False if signs of x and y are the same, True otherwise
 # Warning, this does not detect a change in sign between (+/- value) and 0
@@ -22,6 +22,16 @@ def is_in_interval(val, interval):
         return False
     else:
         return True
+    
+
+
+def is_in_xy_interval(pos, intervals):
+    
+    for i, interval in enumerate(intervals):
+        if not is_in_interval(pos[i], interval):
+            return False
+    return True
+        
     
 
 # Newton–Raphson method
@@ -58,10 +68,84 @@ def calc_intercept(func, interval, n_iter = 100, error = 1e-10, force_find = Fal
 
 
 
-# Finds possible intercepts in an interval
-def estimate_all_intercepts(f, g, interval, n_tests = 100, n_iter = 100, error = 1e-10):
+# Finds possible intercepts in an interval for a function
+def estimate_all_intercepts(ray: Ray, # The light ray
+                            func, # The function of the surface
+                            interval, # The rectangle defining where x and y can exist
+                            n_tests = 100, # Number of points to test inside interval
+                            n_iter = 100, # Number of iterations to converge to a solution
+                            error = 1e-10 # The acceptable error for a correct solution
+                           ):
     
-    interval = np.sort(interval)
+    x_interval = np.sort(interval[0])
+    y_interval = np.sort(interval[1])
+    
+    
+    x0_interval_intercept_dist = ray.where(x = x_interval[0])
+    x1_interval_intercept_dist = ray.where(x = x_interval[1])
+    
+    y0_interval_intercept_dist = ray.where(y = y_interval[0])
+    y1_interval_intercept_dist = ray.where(y = y_interval[1])
+    
+    dist_array = np.array([x0_interval_intercept_dist,
+                           x1_interval_intercept_dist,
+                           y0_interval_intercept_dist,
+                           y1_interval_intercept_dist])
+    
+    # Remove Nones from array
+    dist_array[dist_array != np.array(None)]
+    
+    dist_array_sorted = np.sort(dist_array)
+    
+    if len(dist_array_sorted) == 0:
+        return None
+    
+    # Check if Ray's starting position is inside the boundary
+    
+    is_inside = is_in_xy_interval(ray.start_pos, [x_interval, y_interval])
+    
+    
+    dist_interval = np.array([])
+    
+    if is_inside:
+        # First distance in dist_array_sorted must exit boundary
+        dist_interval = np.array([0, dist_array_sorted[0]])
+        
+    else:
+        if len(dist_array_sorted) < 2:
+            # Ray must enter and exit object, so must have atleast 2 elements
+            return None
+        
+        
+        for i, val in enumerate(dist_array_sorted):
+            if i == 0:
+                continue
+            
+            ave_dist = (dist_array_sorted[i] + dist_array_sorted[i-1]) / 2
+            
+            if is_in_xy_interval(ray.pos_from_distance(ave_dist), [x_interval, y_interval]):
+                dist_interval = np.array([dist_array_sorted[i], dist_array_sorted[i-1]])
+                break
+                
+            if i == len(dist_array_sorted) - 1:
+                return None
+            
+            
+    
+    # Can tell which distances are actually inside the object
+    # dist_array_sorted defines where the ray enters/exits the boundary
+    
+    
+
+    # Now x_interval and y_interval have their spread reduced (if needed)
+    
+    test_length = ((x_interval[1] - x_interval[0]) ** 2 + (y_interval[1] - y_interval[0]) ** 2) ** 0.5
+    
+    test_length_
+    
+    
+    
+    
     
     def diff_func(x):
         return f(x) - g(x)
