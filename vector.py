@@ -58,7 +58,7 @@ class Vec:
             thing = np.array(thing)
             return Vec(self.vec * thing)
         
-        elif isinstance(x, int) or isinstance(x, float):
+        elif isinstance(thing, int) or isinstance(thing, float):
             return Vec(self.vec * thing)
         else:
             raise NotImplementedError(f"Type {type(thing)} not implemented for using operator '*'")
@@ -70,7 +70,7 @@ class Vec:
     def __rmul__(self, thing):
         return self.__mul__(thing)
         
-    def __div__(self, thing):
+    def __truediv__(self, thing):
         
         if isinstance(thing, Vec):
             return Vec(self.vec / thing.vec)
@@ -79,16 +79,16 @@ class Vec:
             thing = np.array(thing)
             return Vec(self.vec / thing)
         
-        elif isinstance(x, int) or isinstance(x, float):
+        elif isinstance(thing, int) or isinstance(thing, float):
             return Vec(self.vec / thing)
         else:
             raise NotImplementedError(f"Type {type(thing)} not implemented for using operator '/'")
     
-    def __idiv__(self, thing):
-        self.vec = self.__div__(thing)
+    def __itruediv__(self, thing):
+        self.vec = self.__truediv__(thing)
         return self
         
-    def __rdiv__(self, thing):
+    def __rtruediv__(self, thing):
         
         if isinstance(thing, Vec):
             return Vec(self.vec / thing.vec)
