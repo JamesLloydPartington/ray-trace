@@ -180,8 +180,3 @@ def test_for():
     for i, val in enumerate(a):
         assert inerror(val, a_list[i])
         assert inerror(val, a[i])
-    
-    
-    
-    
-

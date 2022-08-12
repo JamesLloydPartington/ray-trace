@@ -4,7 +4,7 @@ import collections.abc
     
 class Vec:
     def __init__(self, array):
-        self.vec = np.array(array)
+        self.vec = np.array(array, dtype=np.float32)
         self.normalised = False
         
     def __len__(self):
